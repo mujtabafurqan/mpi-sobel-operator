@@ -386,7 +386,61 @@ sendStridedBuffer(float *srcBuf,
    // sendWidth by sendHeight values, and the subregion is offset from the origin of
    // srcBuf by the values specificed by srcOffsetColumn, srcOffsetRow.
    //
+   // MPI_Datatype subArray;
+   // MPI_Type_create_subarray((int[]){srcHeight, srcWidth}, (int[]){sendHeight, sendWidth}, (int[]){srcOffsetRow, srcOffsetColumn},
+   //                            MPI_ORDER_C, MPI_FLOAT, &subArray);
 
+   // MPI_Type_commit(&subArray);
+
+   // MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
+
+   // printf(srcBuf, srcWidth, srcHeight, fromRank,  "sending baseArray to rank %d", toRank, subArray);
+
+   // MPI_Type_free(&subArray);
+
+   int size_of_data = sendWidth*sendHeight;
+   int array_of_sizes[] = {size_of_data};
+   int array_of_subsizes[] = {size_of_data/10};
+   int array_of_starts[] = {1};
+   MPI_Datatype newtype;
+
+   MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype);
+   MPI_Type_commit(&newtype);
+
+   if ((srcWidth == sendWidth) && (srcHeight == sendHeight) &&
+       (srcOffsetRow == 0) && (srcOffsetColumn == 0))  // if subregion width and height is equal to the width that is sent and the sub region row and col offset is 0 then we will have to send the complete buffer.
+   {
+      
+      // int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+      //*srcBuf => initial address of buffer
+
+      int no_of_elements_buffer = 1;
+      MPI_Send(srcBuf, no_of_elements_buffer, newtype, toRank, msgTag, MPI_COMM_WORLD);
+      sendCtr++;
+   }
+   else
+   {      
+  
+      int buffer_index = srcOffsetRow*srcWidth+srcOffsetColumn; 
+
+      float tile_content[size_of_data];
+      int k = 0;
+
+      for (int i = 0; i < sendHeight; i++, buffer_index += srcWidth){
+
+         for (int j = 0; j < sendWidth; j++, k++){
+
+            tile_content[k] = srcBuf[buffer_index+j];
+         }
+      }
+
+      MPI_Send(tile_content, 1, newtype, toRank, msgTag, MPI_COMM_WORLD);
+      sendCtr++;
+    
+   }
+
+   MPI_Type_free(&newtype);
+   printf("send count: %d\n", sendCtr);
 }
 
 void
@@ -408,6 +462,65 @@ recvStridedBuffer(float *dstBuf,
    // at dstOffsetColumn, dstOffsetRow, and that is expectedWidth, expectedHeight in size.
    //
 
+   // MPI_Datatype subArray;
+   // MPI_Type_create_subarray((int[]){dstHeight, dstWidth}, (int[]){expectedHeight, expectedWidth}, (int[]){dstOffsetRow, dstOffsetColumn},
+   //                            MPI_ORDER_C, MPI_FLOAT, &subArray);
+
+   // MPI_Type_commit(&subArray);
+
+   // MPI_Recv(dstBuf, 1, subArray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+
+   // printf(dstBuf, dstWidth, dstHeight, toRank,  "receiving baseArray from rank %d", fromRank, subArray);
+
+   // MPI_Type_free(&subArray);
+
+   int rank_value;
+   int msgTag = 0;
+   int size_of_data = dstWidth*dstHeight;
+   float receiveData[size_of_data];
+   int array_of_sizes[] = {size_of_data};
+   int array_of_subsizes[] = {size_of_data/10};
+   int array_of_starts[] = {1};
+   MPI_Datatype newtype_receiving;
+   MPI_Status mpi_status;
+
+
+   MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype_receiving);
+   MPI_Type_commit(&newtype_receiving);
+
+   if ((dstWidth == expectedWidth) && (dstHeight == expectedHeight) &&
+       (dstOffsetColumn == 0) && (dstOffsetRow == 0))  // if destination width and height is same as expected we receive the entire buffer
+   {
+
+      // int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
+      //        MPI_Comm comm, MPI_Status *status)
+   
+      MPI_Recv(dstBuf, size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
+
+      // int MPI_Get_count( const MPI_Status *status, MPI_Datatype datatype, int *count )
+      MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value); //to get the total data moved
+      total_data_moved+=rank_value;
+   }
+   else
+   { 
+      MPI_Recv(&receiveData[0], size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
+      MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value);
+      total_data_moved+=rank_value;
+
+      int buffer_index = dstOffsetRow*dstWidth+dstOffsetColumn;  
+      // put the data into the destination appropriately
+      for (int row = 0; row < expectedHeight; row++, buffer_index += dstWidth)
+      {
+         for (int x = 0, y = 0; x < expectedWidth; x++, y++)
+         {
+            dstBuf[buffer_index+x] = receiveData[y];
+         }
+      }
+   }
+
+   MPI_Type_free(&newtype_receiving);
+   printf("total data moved: %d\n", total_data_moved);
+
 }
 
 
@@ -416,6 +529,45 @@ recvStridedBuffer(float *dstBuf,
 // that performs sobel filtering
 // suggest using your cpu code from HW5, no OpenMP parallelism 
 //
+
+float
+sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, float *gy)
+{
+   float t=0.0;
+
+   // ADD CODE HERE: add your code here for computing the sobel stencil computation at location (i,j)
+   // of input s, returning a float
+
+   if(i>0 && i<nrows-1 && j>0 && j<ncols-1){
+      float Gx = 0.0;
+      float Gy = 0.0;
+      for(int k=0; k<3; k++) {
+         for(int l=0; l<3; l++) {
+            Gx += gx[k*3+l] * s[(i+k-1)*ncols + (j+l-1)];
+            Gy += gy[k*3+l] * s[(i+k-1)*ncols + (j+l-1)];
+         }
+      }
+      t = sqrt(Gx*Gx + Gy*Gy);
+   }
+
+   return t;
+}
+
+void
+do_sobel_filtering(float *in, float *out, int ncols, int nrows)
+{
+   float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
+   float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
+
+   // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
+   // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
+
+   for(int i=0; i<nrows; i++) {
+      for(int j=0; j<ncols; j++) {
+         out[i*ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+      }
+   }
+}
 
 
 void
@@ -431,14 +583,18 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 #if 0
             // debug code
             // v1: fill the output buffer with the value of myrank
-            //            printf(" sobelAllTiles(): filling the output buffer of size=%d with myrank=%d\n:", t->outputBuffer.size(), myrank);
-            //std::fill(t->outputBuffer.begin(), t->outputBuffer.end(), myrank);
+            printf(" sobelAllTiles(): filling the output buffer of size=%d with myrank=%d\n:", t->outputBuffer.size(), myrank);
+            std::fill(t->outputBuffer.begin(), t->outputBuffer.end(), myrank);
 
             // v2. copy the input to the output, umodified
          //   std::copy(t->inputBuffer.begin(), t->inputBuffer.end(), t->outputBuffer.begin());
+
 #endif
          // ADD YOUR CODE HERE
          // to call your sobel filtering code on each tile
+
+            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->tileWidth, t->tileHeight);
+
          }
       }
    }
