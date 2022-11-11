@@ -482,7 +482,6 @@ recvStridedBuffer(float *dstBuf,
    // MPI_Type_free(&subArray);
 
    int rank_value;
-   int msgTag = 0;
    int size_of_data = dstWidth*dstHeight;
    float receiveData[size_of_data];
    int array_of_sizes[] = {size_of_data};
