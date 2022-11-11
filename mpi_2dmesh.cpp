@@ -42,6 +42,13 @@
 
 #define DEBUG_TRACE 0 
 
+int sendCtr = 0; //no of messages sent
+
+int total_data_moved = 0; //data moved
+
+int number_of_tiles =0;
+int size_of_each_tile = 0;
+
 int
 parseArgs(int ac, char *av[], AppState *as)
 {
