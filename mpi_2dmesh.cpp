@@ -393,15 +393,17 @@ sendStridedBuffer(float *srcBuf,
    // sendWidth by sendHeight values, and the subregion is offset from the origin of
    // srcBuf by the values specificed by srcOffsetColumn, srcOffsetRow.
    //
+
+   int sendDim[2] = {sendWidth, sendHeight};
    MPI_Datatype subArray;
-   MPI_Type_create_subarray(1,(int[]){srcHeight, srcWidth}, (int[]){sendHeight, sendWidth}, (int[]){srcOffsetRow, srcOffsetColumn},
+   MPI_Type_create_subarray(2,sendDim, (int[]){sendHeight, sendWidth}, (int[]){srcOffsetRow, srcOffsetColumn},
                               MPI_ORDER_C, MPI_FLOAT, &subArray);
 
    MPI_Type_commit(&subArray);
 
    MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
 
-   printf(srcBuf, srcWidth, srcHeight, fromRank,  "sending baseArray to rank %d", toRank, subArray);
+   // printf(srcBuf, srcWidth, srcHeight, fromRank,  "sending baseArray to rank %d", toRank, subArray);
 
    MPI_Type_free(&subArray);
 
@@ -469,15 +471,16 @@ recvStridedBuffer(float *dstBuf,
    // at dstOffsetColumn, dstOffsetRow, and that is expectedWidth, expectedHeight in size.
    //
 
+   // int dstDim[2] = {expectedWidth, expectedHeight};
    MPI_Datatype subArray;
-   MPI_Type_create_subarray(1,(int[]){dstHeight, dstWidth}, (int[]){expectedHeight, expectedWidth}, (int[]){dstOffsetRow, dstOffsetColumn},
+   MPI_Type_create_subarray(2,(int[]){dstHeight, dstWidth}, (int[]){expectedHeight, expectedWidth}, (int[]){dstOffsetRow, dstOffsetColumn},
                               MPI_ORDER_C, MPI_FLOAT, &subArray);
 
    MPI_Type_commit(&subArray);
 
    MPI_Recv(dstBuf, 1, subArray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
 
-   printf(dstBuf, dstWidth, dstHeight, toRank,  "receiving baseArray from rank %d", fromRank, subArray);
+   // printf(dstBuf, dstWidth, dstHeight, toRank,  "receiving baseArray from rank %d", fromRank, subArray);
 
    MPI_Type_free(&subArray);
 
