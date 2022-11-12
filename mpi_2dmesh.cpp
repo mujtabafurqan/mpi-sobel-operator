@@ -647,10 +647,10 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
 #if DEBUG_TRACE
                printf("scatterAllTiles() send side: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d \n", t->tileRank, myrank, t->inputBuffer.size());
 #endif
-               printf("xmin : %d", t->xmin);
-               printf("xmax : %d", t->xmax);
-               printf("ymin : %d", t->ymin);
-               printf("ymax : %d", t->ymax);
+               printf("xmin : %d", t->ghost_xmin);
+               printf("xmax : %d", t->ghost_xmax);
+               printf("ymin : %d", t->ghost_ymin);
+               printf("ymax : %d", t->ghost_ymax);
                sendStridedBuffer(s, // ptr to the buffer to send
                      global_width, global_height,  // size of the src buffer
                      t->xloc, t->yloc, // offset into the send buffer
