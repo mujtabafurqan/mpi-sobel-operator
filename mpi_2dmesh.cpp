@@ -393,61 +393,61 @@ sendStridedBuffer(float *srcBuf,
    // sendWidth by sendHeight values, and the subregion is offset from the origin of
    // srcBuf by the values specificed by srcOffsetColumn, srcOffsetRow.
    //
-   // MPI_Datatype subArray;
-   // MPI_Type_create_subarray((int[]){srcHeight, srcWidth}, (int[]){sendHeight, sendWidth}, (int[]){srcOffsetRow, srcOffsetColumn},
-   //                            MPI_ORDER_C, MPI_FLOAT, &subArray);
+   MPI_Datatype subArray;
+   MPI_Type_create_subarray(1,(int[]){srcHeight, srcWidth}, (int[]){sendHeight, sendWidth}, (int[]){srcOffsetRow, srcOffsetColumn},
+                              MPI_ORDER_C, MPI_FLOAT, &subArray);
 
-   // MPI_Type_commit(&subArray);
+   MPI_Type_commit(&subArray);
 
-   // MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
+   MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
 
-   // printf(srcBuf, srcWidth, srcHeight, fromRank,  "sending baseArray to rank %d", toRank, subArray);
+   printf(srcBuf, srcWidth, srcHeight, fromRank,  "sending baseArray to rank %d", toRank, subArray);
 
-   // MPI_Type_free(&subArray);
+   MPI_Type_free(&subArray);
 
-   int size_of_data = sendWidth*sendHeight;
-   int array_of_sizes[] = {size_of_data};
-   int array_of_subsizes[] = {size_of_data/10};
-   int array_of_starts[] = {1};
-   MPI_Datatype newtype;
+   // int size_of_data = sendWidth*sendHeight;
+   // int array_of_sizes[] = {size_of_data};
+   // int array_of_subsizes[] = {size_of_data/10};
+   // int array_of_starts[] = {1};
+   // MPI_Datatype newtype;
 
-   MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype);
-   MPI_Type_commit(&newtype);
+   // MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype);
+   // MPI_Type_commit(&newtype);
 
-   if ((srcWidth == sendWidth) && (srcHeight == sendHeight) &&
-       (srcOffsetRow == 0) && (srcOffsetColumn == 0))  // if subregion width and height is equal to the width that is sent and the sub region row and col offset is 0 then we will have to send the complete buffer.
-   {
+   // if ((srcWidth == sendWidth) && (srcHeight == sendHeight) &&
+   //     (srcOffsetRow == 0) && (srcOffsetColumn == 0))  // if subregion width and height is equal to the width that is sent and the sub region row and col offset is 0 then we will have to send the complete buffer.
+   // {
       
-      // int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
-      //*srcBuf => initial address of buffer
+   //    // int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
+   //    //*srcBuf => initial address of buffer
 
-      int no_of_elements_buffer = 1;
-      MPI_Send(srcBuf, no_of_elements_buffer, newtype, toRank, msgTag, MPI_COMM_WORLD);
-      sendCtr++;
-   }
-   else
-   {      
+   //    int no_of_elements_buffer = 1;
+   //    MPI_Send(srcBuf, no_of_elements_buffer, newtype, toRank, msgTag, MPI_COMM_WORLD);
+   //    sendCtr++;
+   // }
+   // else
+   // {      
   
-      int buffer_index = srcOffsetRow*srcWidth+srcOffsetColumn; 
+   //    int buffer_index = srcOffsetRow*srcWidth+srcOffsetColumn; 
 
-      float tile_content[size_of_data];
-      int k = 0;
+   //    float tile_content[size_of_data];
+   //    int k = 0;
 
-      for (int i = 0; i < sendHeight; i++, buffer_index += srcWidth){
+   //    for (int i = 0; i < sendHeight; i++, buffer_index += srcWidth){
 
-         for (int j = 0; j < sendWidth; j++, k++){
+   //       for (int j = 0; j < sendWidth; j++, k++){
 
-            tile_content[k] = srcBuf[buffer_index+j];
-         }
-      }
+   //          tile_content[k] = srcBuf[buffer_index+j];
+   //       }
+   //    }
 
-      MPI_Send(tile_content, 1, newtype, toRank, msgTag, MPI_COMM_WORLD);
-      sendCtr++;
+   //    MPI_Send(tile_content, 1, newtype, toRank, msgTag, MPI_COMM_WORLD);
+   //    sendCtr++;
     
-   }
+   // }
 
-   MPI_Type_free(&newtype);
-   printf("send count: %d\n", sendCtr);
+   // MPI_Type_free(&newtype);
+   // printf("send count: %d\n", sendCtr);
 }
 
 void
@@ -469,63 +469,63 @@ recvStridedBuffer(float *dstBuf,
    // at dstOffsetColumn, dstOffsetRow, and that is expectedWidth, expectedHeight in size.
    //
 
-   // MPI_Datatype subArray;
-   // MPI_Type_create_subarray((int[]){dstHeight, dstWidth}, (int[]){expectedHeight, expectedWidth}, (int[]){dstOffsetRow, dstOffsetColumn},
-   //                            MPI_ORDER_C, MPI_FLOAT, &subArray);
+   MPI_Datatype subArray;
+   MPI_Type_create_subarray(1,(int[]){dstHeight, dstWidth}, (int[]){expectedHeight, expectedWidth}, (int[]){dstOffsetRow, dstOffsetColumn},
+                              MPI_ORDER_C, MPI_FLOAT, &subArray);
 
-   // MPI_Type_commit(&subArray);
+   MPI_Type_commit(&subArray);
 
-   // MPI_Recv(dstBuf, 1, subArray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
+   MPI_Recv(dstBuf, 1, subArray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
 
-   // printf(dstBuf, dstWidth, dstHeight, toRank,  "receiving baseArray from rank %d", fromRank, subArray);
+   printf(dstBuf, dstWidth, dstHeight, toRank,  "receiving baseArray from rank %d", fromRank, subArray);
 
-   // MPI_Type_free(&subArray);
+   MPI_Type_free(&subArray);
 
-   int rank_value;
-   int size_of_data = dstWidth*dstHeight;
-   float receiveData[size_of_data];
-   int array_of_sizes[] = {size_of_data};
-   int array_of_subsizes[] = {size_of_data/10};
-   int array_of_starts[] = {1};
-   MPI_Datatype newtype_receiving;
-   MPI_Status mpi_status;
+   // int rank_value;
+   // int size_of_data = dstWidth*dstHeight;
+   // float receiveData[size_of_data];
+   // int array_of_sizes[] = {size_of_data};
+   // int array_of_subsizes[] = {size_of_data/10};
+   // int array_of_starts[] = {1};
+   // MPI_Datatype newtype_receiving;
+   // MPI_Status mpi_status;
 
 
-   MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype_receiving);
-   MPI_Type_commit(&newtype_receiving);
+   // MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype_receiving);
+   // MPI_Type_commit(&newtype_receiving);
 
-   if ((dstWidth == expectedWidth) && (dstHeight == expectedHeight) &&
-       (dstOffsetColumn == 0) && (dstOffsetRow == 0))  // if destination width and height is same as expected we receive the entire buffer
-   {
+   // if ((dstWidth == expectedWidth) && (dstHeight == expectedHeight) &&
+   //     (dstOffsetColumn == 0) && (dstOffsetRow == 0))  // if destination width and height is same as expected we receive the entire buffer
+   // {
 
-      // int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
-      //        MPI_Comm comm, MPI_Status *status)
+   //    // int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
+   //    //        MPI_Comm comm, MPI_Status *status)
    
-      MPI_Recv(dstBuf, size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
+   //    MPI_Recv(dstBuf, size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
 
-      // int MPI_Get_count( const MPI_Status *status, MPI_Datatype datatype, int *count )
-      MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value); //to get the total data moved
-      total_data_moved+=rank_value;
-   }
-   else
-   { 
-      MPI_Recv(&receiveData[0], size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
-      MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value);
-      total_data_moved+=rank_value;
+   //    // int MPI_Get_count( const MPI_Status *status, MPI_Datatype datatype, int *count )
+   //    MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value); //to get the total data moved
+   //    total_data_moved+=rank_value;
+   // }
+   // else
+   // { 
+   //    MPI_Recv(&receiveData[0], size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
+   //    MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value);
+   //    total_data_moved+=rank_value;
 
-      int buffer_index = dstOffsetRow*dstWidth+dstOffsetColumn;  
-      // put the data into the destination appropriately
-      for (int row = 0; row < expectedHeight; row++, buffer_index += dstWidth)
-      {
-         for (int x = 0, y = 0; x < expectedWidth; x++, y++)
-         {
-            dstBuf[buffer_index+x] = receiveData[y];
-         }
-      }
-   }
+   //    int buffer_index = dstOffsetRow*dstWidth+dstOffsetColumn;  
+   //    // put the data into the destination appropriately
+   //    for (int row = 0; row < expectedHeight; row++, buffer_index += dstWidth)
+   //    {
+   //       for (int x = 0, y = 0; x < expectedWidth; x++, y++)
+   //       {
+   //          dstBuf[buffer_index+x] = receiveData[y];
+   //       }
+   //    }
+   // }
 
-   MPI_Type_free(&newtype_receiving);
-   printf("total data moved: %d\n", total_data_moved);
+   // MPI_Type_free(&newtype_receiving);
+   // printf("total data moved: %d\n", total_data_moved);
 
 }
 
