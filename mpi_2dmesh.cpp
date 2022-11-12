@@ -601,7 +601,7 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 
             // do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->tileWidth, t->tileHeight);
 
-            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->height, t->width);
+            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height);
 
          }
       }
