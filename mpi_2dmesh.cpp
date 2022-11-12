@@ -405,8 +405,6 @@ sendStridedBuffer(float *srcBuf,
 
    MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
 
-   // printf(srcBuf, srcWidth, srcHeight, fromRank,  "sending baseArray to rank %d", toRank, subArray);
-
    MPI_Type_free(&subArray);
 
    // int size_of_data = sendWidth*sendHeight;
@@ -484,8 +482,6 @@ recvStridedBuffer(float *dstBuf,
    MPI_Type_commit(&subArray);
 
    MPI_Recv(dstBuf, 1, subArray, fromRank, msgTag, MPI_COMM_WORLD, &stat);
-
-   // printf(dstBuf, dstWidth, dstHeight, toRank,  "receiving baseArray from rank %d", fromRank, subArray);
 
    MPI_Type_free(&subArray);
 
@@ -651,7 +647,10 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
 #if DEBUG_TRACE
                printf("scatterAllTiles() send side: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d \n", t->tileRank, myrank, t->inputBuffer.size());
 #endif
-
+               printf("xmin : %d", t->xmin);
+               printf("xmax : %d", t->xmax);
+               printf("ymin : %d", t->ymin);
+               printf("ymax : %d", t->ymax);
                sendStridedBuffer(s, // ptr to the buffer to send
                      global_width, global_height,  // size of the src buffer
                      t->xloc, t->yloc, // offset into the send buffer
