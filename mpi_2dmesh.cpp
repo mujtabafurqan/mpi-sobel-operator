@@ -395,7 +395,7 @@ sendStridedBuffer(float *srcBuf,
    //
 
    int sendDim[2] = {sendWidth, sendHeight};
-   int sendOffset[2] = {srcOffsetRow, srcOffsetColumn };
+   int sendOffset[2] = {srcOffsetColumn, srcOffsetRow};
    int srcDim[2] = {srcWidth, srcHeight};
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,srcDim, sendDim, sendOffset,
@@ -474,8 +474,8 @@ recvStridedBuffer(float *dstBuf,
    //
 
 
-   int dstDims[2] = {dstOffsetRow, dstOffsetColumn};
-   int dstOffset[2] = {dstOffsetRow, dstOffsetColumn};
+   int dstDims[2] = {dstWidth, dstHeight};
+   int dstOffset[2] = {dstOffsetColumn, dstOffsetRow};
    int expectedDims[2] = {expectedWidth, expectedHeight};
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,dstDims, expectedDims,dstOffset,
