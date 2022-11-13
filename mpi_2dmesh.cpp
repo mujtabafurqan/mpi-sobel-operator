@@ -600,9 +600,9 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                if(yloc < t->ghost_ymin) yloc = 0;
                int width = (t->width) + 2;
 
-               if(yloc+width> t->ghost_ymax) width = (t->width)-1;
+               if(yloc+width> global_width) width = (t->width)-1;
                int height = (t->height) + 2;
-               if(xloc+height > t->ghost_xmax) height = (t->height)-1;
+               if(xloc+height > global_height) height = (t->height)-1;
                printf("xlocO=%d, ylocO=%d, widthO=%d, heightO=%d\n", t->xloc, t->yloc, t->width, t->height);
                printf("xloc=%d, yloc=%d, width=%d, height=%d\n", xloc, yloc, width, height);
                sendStridedBuffer(s, // ptr to the buffer to send
