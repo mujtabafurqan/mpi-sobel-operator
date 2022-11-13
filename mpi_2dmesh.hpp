@@ -96,8 +96,6 @@ class Tile2D
       ghost_xmin = ghost_ymin = 0;
       ghost_xmax = xsize;
       ghost_ymax = ysize;
-      xoffset = 1;
-      yoffset = 1;
       inputBuffer.resize(0); // start with empty tiles
       outputBuffer.resize(0);
 
