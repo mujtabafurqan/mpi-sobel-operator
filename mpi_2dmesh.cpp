@@ -542,8 +542,8 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 #if 0
             // debug code
             // v1: fill the output buffer with the value of myrank
-            printf(" sobelAllTiles(): filling the output buffer of size=%d with myrank=%d\n:", t->outputBuffer.size(), myrank);
-            std::fill(t->outputBuffer.begin(), t->outputBuffer.end(), myrank);
+            // printf(" sobelAllTiles(): filling the output buffer of size=%d with myrank=%d\n:", t->outputBuffer.size(), myrank);
+            // std::fill(t->outputBuffer.begin(), t->outputBuffer.end(), myrank);
 
             // v2. copy the input to the output, umodified
          //   std::copy(t->inputBuffer.begin(), t->inputBuffer.end(), t->outputBuffer.begin());
@@ -587,7 +587,10 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
          if(xloc+width> global_width || xloc == 0) width = (t->width)+1;
          int height = (t->height) + 2;
          if(yloc+height > global_height || yloc ==0) height = (t->height)+1;
-
+         
+         printf("global_width: %d, global_height: %d", global_width, global_height);
+         printf("xlocO=%d, ylocO=%d, widthO=%d, heightO=%d\n", t->xloc, t->yloc, t->width, t->height);
+         printf("xloc=%d, yloc=%d, width=%d, height=%d\n", xloc, yloc, width, height);
          if (myrank != 0 && t->tileRank == myrank)
          {
             int fromRank=0;
@@ -611,8 +614,6 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                printf("scatterAllTiles() send side: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d \n", t->tileRank, myrank, t->inputBuffer.size());
 #endif
                
-               printf("xlocO=%d, ylocO=%d, widthO=%d, heightO=%d\n", t->xloc, t->yloc, t->width, t->height);
-               printf("xloc=%d, yloc=%d, width=%d, height=%d\n", xloc, yloc, width, height);
                sendStridedBuffer(s, // ptr to the buffer to send
                      global_width, global_height,  // size of the src buffer
                      xloc, yloc, // offset into the send buffer
