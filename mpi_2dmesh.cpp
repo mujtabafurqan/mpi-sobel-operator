@@ -587,7 +587,7 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
             int fromRank=0;
 
             // receive a tile's buffer 
-            t->inputBuffer.resize(t->width*t->height);
+            t->inputBuffer.resize(width*height);
             t->outputBuffer.resize(t->width*t->height);
 #if DEBUG_TRACE
             printf("scatterAllTiles() receive side:: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d, t->outputBuffersize()=%d \n", t->tileRank, myrank, t->inputBuffer.size(), t->outputBuffer.size());
