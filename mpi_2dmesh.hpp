@@ -93,7 +93,9 @@ class Tile2D
       width = xsize;  // specify the width, height of the tile's base grid/buffer
       height = ysize;
       tileRank = rank;
-      ghost_xmin = ghost_xmax = ghost_ymin = ghost_ymax = 0;
+      ghost_xmin = ghost_ymin = 0;
+      ghost_xmax = xsize - 1;
+      ghost_ymax = ysize - 1;
 
       inputBuffer.resize(0); // start with empty tiles
       outputBuffer.resize(0);
