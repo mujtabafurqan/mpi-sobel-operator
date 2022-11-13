@@ -473,7 +473,7 @@ sobel_filtered_pixel(float *s, int i, int j , int ncols, int nrows, float *gx, f
 }
 
 void
-do_sobel_filtering(float *in, float *out, int ncols, int nrows, int i, int j)
+do_sobel_filtering(float *in, float *out, int ncols, int nrows, int xoffset, int yoffset)
 {
    float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
    float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
