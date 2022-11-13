@@ -478,52 +478,6 @@ recvStridedBuffer(float *dstBuf,
 
    MPI_Type_free(&subArray);
 
-   // int rank_value;
-   // int size_of_data = dstWidth*dstHeight;
-   // float receiveData[size_of_data];
-   // int array_of_sizes[] = {size_of_data};
-   // int array_of_subsizes[] = {size_of_data/10};
-   // int array_of_starts[] = {1};
-   // MPI_Datatype newtype_receiving;
-   // MPI_Status mpi_status;
-
-
-   // MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype_receiving);
-   // MPI_Type_commit(&newtype_receiving);
-
-   // if ((dstWidth == expectedWidth) && (dstHeight == expectedHeight) &&
-   //     (dstOffsetColumn == 0) && (dstOffsetRow == 0))  // if destination width and height is same as expected we receive the entire buffer
-   // {
-
-   //    // int MPI_Recv(void *buf, int count, MPI_Datatype datatype, int source, int tag,
-   //    //        MPI_Comm comm, MPI_Status *status)
-   
-   //    MPI_Recv(dstBuf, size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
-
-   //    // int MPI_Get_count( const MPI_Status *status, MPI_Datatype datatype, int *count )
-   //    MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value); //to get the total data moved
-   //    total_data_moved+=rank_value;
-   // }
-   // else
-   // { 
-   //    MPI_Recv(&receiveData[0], size_of_data, MPI_FLOAT, fromRank, msgTag, MPI_COMM_WORLD, &mpi_status);
-   //    MPI_Get_count(&mpi_status, MPI_FLOAT, &rank_value);
-   //    total_data_moved+=rank_value;
-
-   //    int buffer_index = dstOffsetRow*dstWidth+dstOffsetColumn;  
-   //    // put the data into the destination appropriately
-   //    for (int row = 0; row < expectedHeight; row++, buffer_index += dstWidth)
-   //    {
-   //       for (int x = 0, y = 0; x < expectedWidth; x++, y++)
-   //       {
-   //          dstBuf[buffer_index+x] = receiveData[y];
-   //       }
-   //    }
-   // }
-
-   // MPI_Type_free(&newtype_receiving);
-   // printf("total data moved: %d\n", total_data_moved);
-
 }
 
 
@@ -575,6 +529,7 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
 
 void
 sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
+
    for (int row=0;row<tileArray.size(); row++)
    {
       for (int col=0; col<tileArray[row].size(); col++)
@@ -643,20 +598,20 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                printf("xmax : %d", t->ghost_xmax);
                printf("ymin : %d", t->ghost_ymin);
                printf("ymax : %d", t->ghost_ymax);
-               // int xloc = (t->xloc) - 1;
-               // if(xloc < t->ghost_xmin) xloc = 0;
-               // int yloc = (t->yloc) - 1;
-               // if(yloc < t->ghost_ymin) yloc = 0;
+               int xloc = (t->xloc) - 1;
+               if(xloc < t->ghost_xmin) xloc = 0;
+               int yloc = (t->yloc) - 1;
+               if(yloc < t->ghost_ymin) yloc = 0;
 
-               // int width = (t->width) + 1;
-               // if(width> t->ghost_ymax) width = t->width;
-               // int height = (t->height) + 1;
-               // if(height > t->ghost_xmax) height = t->height;
+               int width = (t->width) + 1;
+               if(width> t->ghost_ymax) width = t->width;
+               int height = (t->height) + 1;
+               if(height > t->ghost_xmax) height = t->height;
                
                sendStridedBuffer(s, // ptr to the buffer to send
                      global_width, global_height,  // size of the src buffer
-                     t->xloc, t->yloc, // offset into the send buffer
-                     t->width, t->height,  // size of the buffer to send,
+                     xloc, yloc, // offset into the send buffer
+                     width, height,  // size of the buffer to send,
                      myrank, t->tileRank);
             }
             else // rather then have rank 0 send to rank 0, just do a strided copy into a tile's input buffer
