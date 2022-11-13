@@ -79,7 +79,7 @@ class Tile2D
 
    int width, height; // dimensions of tile base grid
    int ghost_xmin, ghost_xmax, ghost_ymin, ghost_ymax;
-
+   int xoffset, yoffset;
    int tileRank;      // rank id owner of this tile
 
    vector <float> inputBuffer;
@@ -96,6 +96,7 @@ class Tile2D
       ghost_xmin = ghost_ymin = 0;
       ghost_xmax = xsize;
       ghost_ymax = ysize;
+      xoffset = yoffset = 1;
       inputBuffer.resize(0); // start with empty tiles
       outputBuffer.resize(0);
 
