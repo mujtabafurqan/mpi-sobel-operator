@@ -603,10 +603,10 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                int yloc = (t->yloc) - 1;
                if(yloc < t->ghost_ymin) yloc = 0;
 
-               int width = (t->width) + 1;
-               if(width> t->ghost_ymax) width = t->width;
-               int height = (t->height) + 1;
-               if(height > t->ghost_xmax) height = t->height;
+               int width = (t->width) + 2;
+               if(yloc+width> t->ghost_ymax) width = t->width-1;
+               int height = (t->height) + 2;
+               if(xloc+height > t->ghost_xmax) height = t->height-1;
                
                sendStridedBuffer(s, // ptr to the buffer to send
                      global_width, global_height,  // size of the src buffer
