@@ -572,6 +572,16 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
       {  
          Tile2D *t = &(tileArray[row][col]);
 
+         int xloc = (t->xloc) - 1;
+         if(xloc < t->ghost_xmin) xloc = 0;
+         int yloc = (t->yloc) - 1;
+         if(yloc < t->ghost_ymin) yloc = 0;
+         int width = (t->width) + 2;
+
+         if(yloc+width> global_width) width = (t->width)-1;
+         int height = (t->height) + 2;
+         if(xloc+height > global_height) height = (t->height)-1;
+
          if (myrank != 0 && t->tileRank == myrank)
          {
             int fromRank=0;
@@ -583,9 +593,9 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
             printf("scatterAllTiles() receive side:: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d, t->outputBuffersize()=%d \n", t->tileRank, myrank, t->inputBuffer.size(), t->outputBuffer.size());
 #endif
 
-            recvStridedBuffer(t->inputBuffer.data(), t->width, t->height,
+            recvStridedBuffer(t->inputBuffer.data(), width, height,
                   0, 0,  // offset into the tile buffer: we want the whole thing
-                  t->width, t->height, // how much data coming from this tile
+                  width, height, // how much data coming from this tile
                   fromRank, myrank); 
          }
          else if (myrank == 0)
@@ -594,15 +604,7 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
 #if DEBUG_TRACE
                printf("scatterAllTiles() send side: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d \n", t->tileRank, myrank, t->inputBuffer.size());
 #endif
-               int xloc = (t->xloc) - 1;
-               if(xloc < t->ghost_xmin) xloc = 0;
-               int yloc = (t->yloc) - 1;
-               if(yloc < t->ghost_ymin) yloc = 0;
-               int width = (t->width) + 2;
-
-               if(yloc+width> global_width) width = (t->width)-1;
-               int height = (t->height) + 2;
-               if(xloc+height > global_height) height = (t->height)-1;
+               
                printf("xlocO=%d, ylocO=%d, widthO=%d, heightO=%d\n", t->xloc, t->yloc, t->width, t->height);
                printf("xloc=%d, yloc=%d, width=%d, height=%d\n", xloc, yloc, width, height);
                sendStridedBuffer(s, // ptr to the buffer to send
