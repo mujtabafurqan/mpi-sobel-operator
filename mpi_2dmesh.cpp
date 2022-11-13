@@ -481,12 +481,11 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows, int i, int j)
    // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
    // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
 
-   // for(int i=0; i<nrows; i++) {
-      // for(int j=0; j<ncols; j++) {
-         out[i*ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
-         printf("out[%d] = %f, i = %d, j = %d \n", i*ncols + j, out[i*ncols + j], i, j);
-      // }
-   // }
+   for(int i=xoffset; i<nrows; i++) {
+      for(int j=yoffset; j<ncols; j++) {
+         out[(i-xoffset)*ncols + (j-yoffset)] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+      }
+   }
 }
 
 
@@ -514,8 +513,7 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 #endif
          // ADD YOUR CODE HERE
          // to call your sobel filtering code on each tile
-            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height, row, col);
-            printf("sobelAllTiles: t->outputBuffer[0] = %f\n", t->outputBuffer[0]);
+            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height , t->xoffset, t->yoffset);
 
          }
       }
