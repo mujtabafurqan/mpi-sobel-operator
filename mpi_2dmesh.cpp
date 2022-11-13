@@ -390,6 +390,8 @@ sendStridedBuffer(float *srcBuf,
    int sendDim[2] = {sendHeight, sendWidth};
    int sendOffset[2] = {srcOffsetRow, srcOffsetColumn};
    int srcDim[2] = {srcHeight, srcWidth};
+
+   printf("sendStridedBuffer: sendDims %d %d, sendOffset %d %d, srcDim %d %d\n", sendDim[0], sendDim[1], sendOffset[0], sendOffset[1], srcDim[0], srcDim[1]);
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,srcDim, sendDim, sendOffset,
                               MPI_ORDER_C, MPI_FLOAT, &subArray);
@@ -399,50 +401,6 @@ sendStridedBuffer(float *srcBuf,
    MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
 
    MPI_Type_free(&subArray);
-
-   // int size_of_data = sendWidth*sendHeight;
-   // int array_of_sizes[] = {size_of_data};
-   // int array_of_subsizes[] = {size_of_data/10};
-   // int array_of_starts[] = {1};
-   // MPI_Datatype newtype;
-
-   // MPI_Type_create_subarray(1, array_of_sizes, array_of_subsizes, array_of_starts, MPI_ORDER_C, MPI_FLOAT, &newtype);
-   // MPI_Type_commit(&newtype);
-
-   // if ((srcWidth == sendWidth) && (srcHeight == sendHeight) &&
-   //     (srcOffsetRow == 0) && (srcOffsetColumn == 0))  // if subregion width and height is equal to the width that is sent and the sub region row and col offset is 0 then we will have to send the complete buffer.
-   // {
-      
-   //    // int MPI_Send(const void *buf, int count, MPI_Datatype datatype, int dest, int tag, MPI_Comm comm)
-   //    //*srcBuf => initial address of buffer
-
-   //    int no_of_elements_buffer = 1;
-   //    MPI_Send(srcBuf, no_of_elements_buffer, newtype, toRank, msgTag, MPI_COMM_WORLD);
-   //    sendCtr++;
-   // }
-   // else
-   // {      
-  
-   //    int buffer_index = srcOffsetRow*srcWidth+srcOffsetColumn; 
-
-   //    float tile_content[size_of_data];
-   //    int k = 0;
-
-   //    for (int i = 0; i < sendHeight; i++, buffer_index += srcWidth){
-
-   //       for (int j = 0; j < sendWidth; j++, k++){
-
-   //          tile_content[k] = srcBuf[buffer_index+j];
-   //       }
-   //    }
-
-   //    MPI_Send(tile_content, 1, newtype, toRank, msgTag, MPI_COMM_WORLD);
-   //    sendCtr++;
-    
-   // }
-
-   // MPI_Type_free(&newtype);
-   // printf("send count: %d\n", sendCtr);
 }
 
 void
@@ -468,6 +426,10 @@ recvStridedBuffer(float *dstBuf,
    int dstDims[2] = {dstHeight, dstWidth};
    int dstOffset[2] = { dstOffsetRow, dstOffsetColumn};
    int expectedDims[2] = {expectedHeight, expectedWidth};
+
+   printf("recvStridedBuffer: dstOffset = %d, %d\n", dstOffset[0], dstOffset[1]);
+   printf("recvStridedBuffer: expectedDims = %d, %d\n", expectedDims[0], expectedDims[1]);
+   printf("recvStridedBuffer: dstDims = %d, %d\n", dstDims[0], dstDims[1]);
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,dstDims, expectedDims,dstOffset,
                               MPI_ORDER_C, MPI_FLOAT, &subArray);
