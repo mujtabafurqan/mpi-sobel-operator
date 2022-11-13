@@ -562,7 +562,7 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 void
 scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, int global_width, int global_height)
 {
-   AppState as;
+
 #if DEBUG_TRACE
    printf(" Rank %d is entering scatterAllTiles \n", myrank);
 #endif
@@ -576,11 +576,11 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
          if(xloc < t->ghost_xmin) xloc = 0;
          int yloc = (t->yloc) - 1;
          if(yloc < t->ghost_ymin) yloc = 0;
+         
          int width = (t->width) + 2;
-
-         if(yloc+width> as.global_mesh_size[1]) width = (t->width)+1;
+         if(yloc+width> global_width) width = (t->width)+1;
          int height = (t->height) + 2;
-         if(xloc+height > as.global_mesh_size[0]) height = (t->height)+1;
+         if(xloc+height > global_height) height = (t->height)+1;
 
          if (myrank != 0 && t->tileRank == myrank)
          {
