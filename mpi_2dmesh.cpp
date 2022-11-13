@@ -567,7 +567,10 @@ do_sobel_filtering(float *in, float *out,int i, int j, int ncols, int nrows)
 
    // for(int i=0; i<nrows; i++) {
       // for(int j=0; j<ncols; j++) {
-         &out = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+
+         printf("i: %d, j: %d\n", i, j);
+         out[i*ncols + j] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+         
       // }
    // }
 }
@@ -598,6 +601,7 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
          // to call your sobel filtering code on each tile
 
             do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(),row, col, t->width, t->height);
+            printf("hfhs %d",t->outputBuffer[row*t->width + col]);
 
          }
       }
@@ -643,15 +647,15 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                printf("xmax : %d", t->ghost_xmax);
                printf("ymin : %d", t->ghost_ymin);
                printf("ymax : %d", t->ghost_ymax);
-               int xloc = (t->xloc) - 1;
-               if(xloc < ghost_xmin) xloc = 0;
-               int yloc = (t->yloc) - 1;
-               if(yloc < ghost_ymin) yloc = 0;
+               // int xloc = (t->xloc) - 1;
+               // if(xloc < t->ghost_xmin) xloc = 0;
+               // int yloc = (t->yloc) - 1;
+               // if(yloc < t->ghost_ymin) yloc = 0;
 
-               int width = (t->width) + 1;
-               if(width> t->ghost_ymax) width = t->width;
-               int height = (t->height) + 1;
-               if(height > t->ghost_xmax) height = t->height;
+               // int width = (t->width) + 1;
+               // if(width> t->ghost_ymax) width = t->width;
+               // int height = (t->height) + 1;
+               // if(height > t->ghost_xmax) height = t->height;
                
                sendStridedBuffer(s, // ptr to the buffer to send
                      global_width, global_height,  // size of the src buffer
