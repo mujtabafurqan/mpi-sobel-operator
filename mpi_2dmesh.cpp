@@ -578,9 +578,9 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
          if(yloc < t->ghost_ymin) yloc = 0;
          int width = (t->width) + 2;
 
-         if(yloc+width> global_width) width = (t->width)-1;
+         if(yloc+width> global_width) width = (t->width)+1;
          int height = (t->height) + 2;
-         if(xloc+height > global_height) height = (t->height)-1;
+         if(xloc+height > global_height) height = (t->height)+1;
 
          if (myrank != 0 && t->tileRank == myrank)
          {
