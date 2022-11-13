@@ -513,7 +513,6 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
 #endif
          // ADD YOUR CODE HERE
          // to call your sobel filtering code on each tile
-            if()
             do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height, row, col);
 
          }
