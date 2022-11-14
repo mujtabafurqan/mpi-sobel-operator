@@ -35,7 +35,7 @@
 #include <mpi.h>
 #include <math.h>
 #include <algorithm>
-#include <omp.h>
+// #include <omp.h>
 #include <chrono>
 
 #include "mpi_2dmesh.hpp"  // for AppState and Tile2D class
@@ -866,9 +866,9 @@ int main(int ac, char *av[]) {
 
    if (as.myrank == 0) {
       printf("\n\nTiming results from rank 0: \n");
-      printf("\tScatter time:\t%6.4f (ms) \n", elapsed_scatter_time*1000.0);
-      printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
-      printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
+      // printf("\tScatter time:\t%6.4f (ms) \n", elapsed_scatter_time*1000.0);
+      // printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
+      // printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
    }
 
    MPI_Finalize();
