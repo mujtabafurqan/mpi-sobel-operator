@@ -40,7 +40,7 @@
 
 #include "mpi_2dmesh.hpp"  // for AppState and Tile2D class
 
-#define DEBUG_TRACE 1 
+#define DEBUG_TRACE 0 
 
 int
 parseArgs(int ac, char *av[], AppState *as)
@@ -391,7 +391,7 @@ sendStridedBuffer(float *srcBuf,
    int sendOffset[2] = {srcOffsetRow, srcOffsetColumn};
    int srcDim[2] = {srcHeight, srcWidth};
 
-   printf("sendStridedBuffer: sendDims %d %d, sendOffset %d %d, srcDim %d %d\n", sendDim[0], sendDim[1], sendOffset[0], sendOffset[1], srcDim[0], srcDim[1]);
+   // printf("sendStridedBuffer: sendDims %d %d, sendOffset %d %d, srcDim %d %d\n", sendDim[0], sendDim[1], sendOffset[0], sendOffset[1], srcDim[0], srcDim[1]);
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,srcDim, sendDim, sendOffset,
                               MPI_ORDER_C, MPI_FLOAT, &subArray);
@@ -427,9 +427,9 @@ recvStridedBuffer(float *dstBuf,
    int dstOffset[2] = { dstOffsetRow, dstOffsetColumn};
    int expectedDims[2] = {expectedHeight, expectedWidth};
 
-   printf("recvStridedBuffer: dstOffset = %d, %d\n", dstOffset[0], dstOffset[1]);
-   printf("recvStridedBuffer: expectedDims = %d, %d\n", expectedDims[0], expectedDims[1]);
-   printf("recvStridedBuffer: dstDims = %d, %d\n", dstDims[0], dstDims[1]);
+   // printf("recvStridedBuffer: dstOffset = %d, %d\n", dstOffset[0], dstOffset[1]);
+   // printf("recvStridedBuffer: expectedDims = %d, %d\n", expectedDims[0], expectedDims[1]);
+   // printf("recvStridedBuffer: dstDims = %d, %d\n", dstDims[0], dstDims[1]);
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,dstDims, expectedDims,dstOffset,
                               MPI_ORDER_C, MPI_FLOAT, &subArray);
@@ -571,9 +571,9 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
          if(t->yloc+t->height >= global_height || yloc ==0) height = (t->height)+1;
          t->newWidth = width;
          t->newHeight = height;
-         printf("global_width: %d, global_height: %d\n", global_width, global_height);
-         printf("xlocO=%d, ylocO=%d, widthO=%d, heightO=%d\n", t->xloc, t->yloc, t->width, t->height);
-         printf("xloc=%d, yloc=%d, width=%d, height=%d\n", xloc, yloc, width, height);
+         // printf("global_width: %d, global_height: %d\n", global_width, global_height);
+         // printf("xlocO=%d, ylocO=%d, widthO=%d, heightO=%d\n", t->xloc, t->yloc, t->width, t->height);
+         // printf("xloc=%d, yloc=%d, width=%d, height=%d\n", xloc, yloc, width, height);
          if (myrank != 0 && t->tileRank == myrank)
          {
             int fromRank=0;
