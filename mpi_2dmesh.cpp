@@ -530,7 +530,7 @@ sobelAllTiles(int myrank, vector < vector < Tile2D > > & tileArray) {
          // ADD YOUR CODE HERE
          // to call your sobel filtering code on each tile
             // do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height , t->xoffset, t->yoffset);
-            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->width, t->height);
+            do_sobel_filtering(t->inputBuffer.data(), t->outputBuffer.data(), t->newWidth, t->newHeight);
             printf("offsets: %d, %d , xloc/yloc: %d/%d\n" , t->xoffset, t->yoffset, t->xloc, t->yloc);
 
          }
