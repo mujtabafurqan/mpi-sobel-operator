@@ -566,7 +566,8 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
          if(t->xloc+t->width>= global_width || xloc == 0) width = (t->width)+1;
          int height = (t->height) + 2;
          if(t->yloc+t->height >= global_height || yloc ==0) height = (t->height)+1;
-         
+         t->newWidth = width;
+         t->newHeight = height;
          printf("global_width: %d, global_height: %d\n", global_width, global_height);
          printf("xlocO=%d, ylocO=%d, widthO=%d, heightO=%d\n", t->xloc, t->yloc, t->width, t->height);
          printf("xloc=%d, yloc=%d, width=%d, height=%d\n", xloc, yloc, width, height);
@@ -576,7 +577,7 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
 
             // receive a tile's buffer 
             t->inputBuffer.resize(width*height);
-            t->outputBuffer.resize(t->width*t->height);
+            t->outputBuffer.resize(width*height);
 #if DEBUG_TRACE
             printf("scatterAllTiles() receive side:: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d, t->outputBuffersize()=%d \n", t->tileRank, myrank, t->inputBuffer.size(), t->outputBuffer.size());
 #endif
@@ -715,7 +716,7 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
          {
             // send the tile's output buffer to rank 0
             sendStridedBuffer(t->outputBuffer.data(), // ptr to the buffer to send
-               t->width, t->height,  // size of the src buffer
+               t->newWidth, t->newHeight,  // size of the src buffer
                t->xoffset, t->yoffset, // offset into the send buffer
                t->width, t->height,  // size of the buffer to send,
                t->tileRank, 0);   // from rank, to rank

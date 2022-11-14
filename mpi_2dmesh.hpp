@@ -81,6 +81,7 @@ class Tile2D
    int ghost_xmin, ghost_xmax, ghost_ymin, ghost_ymax;
    int xoffset, yoffset;
    int tileRank;      // rank id owner of this tile
+   int newWidth, newHeight; // dimensions of tile with ghost cells
 
    vector <float> inputBuffer;
    vector <float> outputBuffer;
