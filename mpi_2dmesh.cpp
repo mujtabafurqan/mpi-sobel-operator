@@ -500,6 +500,7 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows, int xoffset, int
    for(int i=xoffset; i<nrows; i++) {
       for(int j=yoffset; j<ncols; j++) {
          out[(i-xoffset)*ncols + (j-yoffset)] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
+         printf("out[%d][%d] = %f\n", i-xoffset, j-yoffset, out[(i-xoffset)*ncols + (j-yoffset)]);
       }
    }
 }
