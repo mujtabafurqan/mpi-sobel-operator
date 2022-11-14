@@ -15,6 +15,6 @@ for P in 9
    for decomp in 3
       do
       echo " srun -n $P $1 -i $input -x $xsize -y $ysize -g $decomp  "
-      srun -n $P $1 -i $input -x $xsize -y $ysize -g $decomp 
+      srun -n $P ./mpi_2dmesh -x $xsize -y $ysize -g $decomp 
       done
    done
