@@ -567,8 +567,10 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
 
          int width = (t->width) + 2;
          if(t->xloc+t->width>= global_width || xloc == 0) width = (t->width)+1;
+         if(t->xloc+t->width>= global_width && xloc == 0) width = (t->width);
          int height = (t->height) + 2;
          if(t->yloc+t->height >= global_height || yloc ==0) height = (t->height)+1;
+         if(t->yloc+t->height >= global_height && yloc ==0) height = (t->height);
          t->newWidth = width;
          t->newHeight = height;
          // printf("global_width: %d, global_height: %d\n", global_width, global_height);
