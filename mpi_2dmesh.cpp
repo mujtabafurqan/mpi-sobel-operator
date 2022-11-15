@@ -388,7 +388,7 @@ sendStridedBuffer(float *srcBuf,
    // sendWidth by sendHeight values, and the subregion is offset from the origin of
    // srcBuf by the values specificed by srcOffsetColumn, srcOffsetRow.
    //
-
+   msgcnt++;
    int sendDim[2] = {sendHeight, sendWidth};
    int sendOffset[2] = {srcOffsetRow, srcOffsetColumn};
    int srcDim[2] = {srcHeight, srcWidth};
@@ -403,7 +403,7 @@ sendStridedBuffer(float *srcBuf,
    MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
 
    MPI_Type_free(&subArray);
-   msgcnt++;
+   
 }
 
 void
@@ -578,7 +578,8 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
             recvStridedBuffer(t->inputBuffer.data(), width, height,
                   0, 0,  // offset into the tile buffer: we want the whole thing
                   width, height, // how much data coming from this tile
-                  fromRank, myrank); 
+                  fromRank, myrank);
+                  datasize += t->inputBuffer.size(); 
          }
          else if (myrank == 0)
          {
@@ -592,7 +593,6 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                      xloc, yloc, // offset into the send buffer
                      width, height,  // size of the buffer to send,
                      myrank, t->tileRank);
-               datasize += t->inputBuffer.size();
             }
             else // rather then have rank 0 send to rank 0, just do a strided copy into a tile's input buffer
             {
@@ -635,7 +635,7 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
 #if DEBUG_TRACE
          printf("gatherAllTiles(): t->tileRank=%d, myrank=%d, t->outputBuffer->size()=%d \n", t->tileRank, myrank, t->outputBuffer.size());
 #endif
-
+         datasize += t->outputBuffer.size();
          if (myrank != 0 && t->tileRank == myrank)
          {
             // send the tile's output buffer to rank 0
@@ -645,7 +645,7 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
                t->width, t->height,  // size of the buffer to send,
                t->tileRank, 0);   // from rank, to rank
 
-               datasize += t->outputBuffer.size();
+               
          }
          else if (myrank == 0)
          {
