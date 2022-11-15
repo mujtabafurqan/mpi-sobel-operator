@@ -43,8 +43,8 @@
 #define DEBUG_TRACE 0 
 
 int msgcnt = 0;
-long long datasize = 0;
-int bytes = 0;
+int datasize = 0;
+double bytes = 0;
 
 int
 parseArgs(int ac, char *av[], AppState *as)
