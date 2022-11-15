@@ -45,6 +45,7 @@
 int msgcnt = 0;
 int datasize = 0;
 int bytes = 0;
+
 parseArgs(int ac, char *av[], AppState *as)
 {
    int rstat = 0;
