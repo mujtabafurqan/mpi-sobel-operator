@@ -43,7 +43,7 @@
 #define DEBUG_TRACE 0 
 
 int msgcnt = 0;
-int datasize = 0;
+long long datasize = 0;
 int bytes = 0;
 
 int
@@ -813,7 +813,7 @@ int main(int ac, char *av[]) {
       printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
       printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
       printf("\tnumber of messages sent:\t%d \n", msgcnt);
-      printf("\ttotal bytes sent:\t%d \n", bytes);
+      printf("\ttotal bytes sent:\t%d \n", bytes/(1024 * 1024 * 1024));
 
    }
 
