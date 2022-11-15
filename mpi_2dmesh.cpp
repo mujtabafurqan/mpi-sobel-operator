@@ -579,7 +579,7 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                   0, 0,  // offset into the tile buffer: we want the whole thing
                   width, height, // how much data coming from this tile
                   fromRank, myrank);
-                  datasize += t->inputBuffer.size(); 
+                   
          }
          else if (myrank == 0)
          {
@@ -635,7 +635,7 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
 #if DEBUG_TRACE
          printf("gatherAllTiles(): t->tileRank=%d, myrank=%d, t->outputBuffer->size()=%d \n", t->tileRank, myrank, t->outputBuffer.size());
 #endif
-         datasize += t->outputBuffer.size();
+         
          if (myrank != 0 && t->tileRank == myrank)
          {
             // send the tile's output buffer to rank 0
@@ -649,6 +649,7 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
          }
          else if (myrank == 0)
          {
+            datasize += t->outputBuffer.size() + t->inputBuffer.size();
             if (t->tileRank != 0) {
                // receive a tile's buffer and copy back into the output buffer d
                recvStridedBuffer(d, global_width, global_height,
