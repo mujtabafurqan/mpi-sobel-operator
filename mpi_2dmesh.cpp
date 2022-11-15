@@ -649,8 +649,6 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
          }
          else if (myrank == 0)
          {
-            printf("t->in.size=%d t->outputBuffer->size()=%d \n", t->inputBuffer.size(), t->outputBuffer.size());
-            datasize += t->outputBuffer.size() + t->inputBuffer.size();
             if (t->tileRank != 0) {
                // receive a tile's buffer and copy back into the output buffer d
                recvStridedBuffer(d, global_width, global_height,
@@ -791,7 +789,15 @@ int main(int ac, char *av[]) {
          writeOutputFile(as);
       }
    }
-
+   for (int row=0;row<tileArray.size(); row++)
+   {
+      for (int col=0; col<tileArray[row].size(); col++)
+      {  
+         Tile2D *t = &tileArray[row][col];
+         printf("t->in.size=%d t->outputBuffer->size()=%d \n", t->inputBuffer.size(), t->outputBuffer.size());
+         datasize += t->outputBuffer.size() + t->inputBuffer.size();
+      }
+   }
    MPI_Barrier(MPI_COMM_WORLD);
 
    if (as.myrank == 0) {
