@@ -649,6 +649,7 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
          }
          else if (myrank == 0)
          {
+            printf("t->in.size=%d t->outputBuffer->size()=%d \n", t->inputBuffer.size(), t->outputBuffer.size());
             datasize += t->outputBuffer.size() + t->inputBuffer.size();
             if (t->tileRank != 0) {
                // receive a tile's buffer and copy back into the output buffer d
