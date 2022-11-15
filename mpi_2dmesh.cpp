@@ -395,7 +395,7 @@ sendStridedBuffer(float *srcBuf,
    int sendOffset[2] = {srcOffsetRow, srcOffsetColumn};
    int srcDim[2] = {srcHeight, srcWidth};
 
-   printf("sendims %d %d, size/n", sendDim[0], sendDim[1], sizeof(float));
+   printf("sendims %d %d, size = %d\n", sendDim[0], sendDim[1], sizeof(float));
    bytes += sendDim[0] * sendDim[1] * sizeof(float);
    // printf("sendStridedBuffer: sendDims %d %d, sendOffset %d %d, srcDim %d %d\n", sendDim[0], sendDim[1], sendOffset[0], sendOffset[1], srcDim[0], srcDim[1]);
    MPI_Datatype subArray;
