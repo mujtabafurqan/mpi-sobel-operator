@@ -44,7 +44,7 @@
 
 int msgcnt = 0;
 int datasize = 0;
-int
+int bytes = 0;
 parseArgs(int ac, char *av[], AppState *as)
 {
    int rstat = 0;
@@ -393,6 +393,7 @@ sendStridedBuffer(float *srcBuf,
    int sendOffset[2] = {srcOffsetRow, srcOffsetColumn};
    int srcDim[2] = {srcHeight, srcWidth};
 
+   bytes += sendDim[0] * sendDim[1] * sizeof(float);
    // printf("sendStridedBuffer: sendDims %d %d, sendOffset %d %d, srcDim %d %d\n", sendDim[0], sendDim[1], sendOffset[0], sendOffset[1], srcDim[0], srcDim[1]);
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,srcDim, sendDim, sendOffset,
@@ -425,7 +426,8 @@ recvStridedBuffer(float *dstBuf,
    // at dstOffsetColumn, dstOffsetRow, and that is expectedWidth, expectedHeight in size.
    //
 
-
+   msgcnt++;
+   bytes += dstHeight * dstWidth * sizeof(float);
    int dstDims[2] = {dstHeight, dstWidth};
    int dstOffset[2] = { dstOffsetRow, dstOffsetColumn};
    int expectedDims[2] = {expectedHeight, expectedWidth};
@@ -790,15 +792,15 @@ int main(int ac, char *av[]) {
       }
    }
 
-   for (int row=0;row<tileArray.size(); row++)
-         {
-            for (int col=0; col<tileArray[row].size(); col++)
-            {  
-               Tile2D *t = &tileArray[row][col];
-               printf("t->in.size=%d t->outputBuffer->size()=%d \n", t->inputBuffer.size(), t->outputBuffer.size());
-               datasize += t->outputBuffer.size() + t->inputBuffer.size();
-            }
-         }
+   // for (int row=0;row<tileArray.size(); row++)
+   //       {
+   //          for (int col=0; col<tileArray[row].size(); col++)
+   //          {  
+   //             Tile2D *t = &tileArray[row][col];
+   //             printf("t->in.size=%d t->outputBuffer->size()=%d \n", t->inputBuffer.size(), t->outputBuffer.size());
+   //             datasize += t->outputBuffer.size() + t->inputBuffer.size();
+   //          }
+   //       }
   
    MPI_Barrier(MPI_COMM_WORLD);
 
@@ -808,7 +810,7 @@ int main(int ac, char *av[]) {
       printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
       printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
       printf("\tnumber of messages sent:\t%d \n", msgcnt);
-      printf("\ttotal bytes sent:\t%d \n", datasize);
+      printf("\ttotal bytes sent:\t%d \n", bytes);
 
    }
 
