@@ -789,15 +789,7 @@ int main(int ac, char *av[]) {
          writeOutputFile(as);
       }
    }
-   for (int row=0;row<tileArray.size(); row++)
-   {
-      for (int col=0; col<tileArray[row].size(); col++)
-      {  
-         Tile2D *t = &tileArray[row][col];
-         printf("t->in.size=%d t->outputBuffer->size()=%d \n", t->inputBuffer.size(), t->outputBuffer.size());
-         datasize += t->outputBuffer.size() + t->inputBuffer.size();
-      }
-   }
+  
    MPI_Barrier(MPI_COMM_WORLD);
 
    if (as.myrank == 0) {
@@ -806,7 +798,17 @@ int main(int ac, char *av[]) {
       printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
       printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
       printf("\tnumber of messages sent:\t%d \n", msgcnt);
+       for (int row=0;row<tileArray.size(); row++)
+         {
+            for (int col=0; col<tileArray[row].size(); col++)
+            {  
+               Tile2D *t = &tileArray[row][col];
+               printf("t->in.size=%d t->outputBuffer->size()=%d \n", t->inputBuffer.size(), t->outputBuffer.size());
+               datasize += t->outputBuffer.size() + t->inputBuffer.size();
+            }
+         }
       printf("\ttotal bytes sent:\t%d \n", datasize);
+
    }
 
    MPI_Finalize();
