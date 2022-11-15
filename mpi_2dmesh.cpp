@@ -42,6 +42,8 @@
 
 #define DEBUG_TRACE 0 
 
+int msgcnt = 0;
+int datasize = 0;
 int
 parseArgs(int ac, char *av[], AppState *as)
 {
@@ -401,6 +403,7 @@ sendStridedBuffer(float *srcBuf,
    MPI_Send(srcBuf, 1, subArray, toRank, msgTag, MPI_COMM_WORLD);
 
    MPI_Type_free(&subArray);
+   msgcnt++;
 }
 
 void
@@ -488,21 +491,6 @@ do_sobel_filtering(float *in, float *out, int ncols, int nrows)
    }
 }
 
-// void
-// do_sobel_filtering(float *in, float *out, int ncols, int nrows, int xoffset, int yoffset)
-// {
-//    float Gx[] = {1.0, 0.0, -1.0, 2.0, 0.0, -2.0, 1.0, 0.0, -1.0};
-//    float Gy[] = {1.0, 2.0, 1.0, 0.0, 0.0, 0.0, -1.0, -2.0, -1.0};
-
-//    // ADD CODE HERE: insert your code here that iterates over every (i,j) of input,  makes a call
-//    // to sobel_filtered_pixel, and assigns the resulting value at location (i,j) in the output.
-
-//    for(int i=xoffset; i<nrows; i++) {
-//       for(int j=yoffset; j<ncols; j++) {
-//          out[(i-xoffset)*ncols + (j-yoffset)] = sobel_filtered_pixel(in, i, j, ncols, nrows, Gx, Gy);
-//       }
-//    }
-// }
 
 
 void
@@ -604,6 +592,7 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
                      xloc, yloc, // offset into the send buffer
                      width, height,  // size of the buffer to send,
                      myrank, t->tileRank);
+               datasize += t->inputBuffer.size();
             }
             else // rather then have rank 0 send to rank 0, just do a strided copy into a tile's input buffer
             {
@@ -633,76 +622,6 @@ scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, 
       
 }
 
-// void
-// scatterAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *s, int global_width, int global_height)
-// {
-
-// #if DEBUG_TRACE
-//    printf(" Rank %d is entering scatterAllTiles \n", myrank);
-// #endif
-//    for (int row=0;row<tileArray.size(); row++)
-//    {
-//       for (int col=0; col<tileArray[row].size(); col++)
-//       {  
-//          Tile2D *t = &(tileArray[row][col]);
-
-//          if (myrank != 0 && t->tileRank == myrank)
-//          {
-//             int fromRank=0;
-
-//             // receive a tile's buffer 
-//             t->inputBuffer.resize(t->width*t->height);
-//             t->outputBuffer.resize(t->width*t->height);
-// #if DEBUG_TRACE
-//             printf("scatterAllTiles() receive side:: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d, t->outputBuffersize()=%d \n", t->tileRank, myrank, t->inputBuffer.size(), t->outputBuffer.size());
-// #endif
-
-//             recvStridedBuffer(t->inputBuffer.data(), t->width, t->height,
-//                   0, 0,  // offset into the tile buffer: we want the whole thing
-//                   t->width, t->height, // how much data coming from this tile
-//                   fromRank, myrank); 
-//          }
-//          else if (myrank == 0)
-//          {
-//             if (t->tileRank != 0) {
-// #if DEBUG_TRACE
-//                printf("scatterAllTiles() send side: t->tileRank=%d, myrank=%d, t->inputBuffer->size()=%d \n", t->tileRank, myrank, t->inputBuffer.size());
-// #endif
-
-//                sendStridedBuffer(s, // ptr to the buffer to send
-//                      global_width, global_height,  // size of the src buffer
-//                      t->xloc, t->yloc, // offset into the send buffer
-//                      t->width, t->height,  // size of the buffer to send,
-//                      myrank, t->tileRank);
-//             }
-//             else // rather then have rank 0 send to rank 0, just do a strided copy into a tile's input buffer
-//             {
-//                t->inputBuffer.resize(t->width*t->height);
-//                t->outputBuffer.resize(t->width*t->height);
-
-//                off_t s_offset=0, d_offset=0;
-//                float *d = t->inputBuffer.data();
-
-//                for (int j=0;j<t->height;j++, s_offset+=global_width, d_offset+=t->width)
-//                {
-//                   memcpy((void *)(d+d_offset), (void *)(s+s_offset), sizeof(float)*t->width);
-//                }
-//             }
-//          }
-//       }
-//    } // loop over 2D array of tiles
-
-// #if DEBUG_TRACE
-//    MPI_Barrier(MPI_COMM_WORLD);
-//    if (myrank == 1){
-//       printf("\n\n ----- rank=%d, inside scatterAllTiles debug printing of the tile array \n", myrank);
-//       printTileArray(tileArray);
-//    }
-//    MPI_Barrier(MPI_COMM_WORLD);
-// #endif
-      
-// }
-
 void
 gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, int global_width, int global_height)
 {
@@ -725,6 +644,8 @@ gatherAllTiles(int myrank, vector < vector < Tile2D > > & tileArray, float *d, i
                t->xoffset, t->yoffset, // offset into the send buffer
                t->width, t->height,  // size of the buffer to send,
                t->tileRank, 0);   // from rank, to rank
+
+               datasize += t->outputBuffer.size();
          }
          else if (myrank == 0)
          {
@@ -876,6 +797,8 @@ int main(int ac, char *av[]) {
       printf("\tScatter time:\t%6.4f (ms) \n", elapsed_scatter_time*1000.0);
       printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
       printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
+      printf("\tnumber of messages sent:\t%d \n", msgcnt);
+      printf("\ttotal bytes sent:\t%d \n", datasize);
    }
 
    MPI_Finalize();
