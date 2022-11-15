@@ -396,7 +396,7 @@ sendStridedBuffer(float *srcBuf,
    int srcDim[2] = {srcHeight, srcWidth};
 
    // printf("sendims %d %d, size = %d\n", sendDim[0], sendDim[1], sizeof(float));
-   bytes += sendDim[0] * sendDim[1] * sizeof(float);
+   bytes += sendDim[0] * sendDim[1] * sizeof(float)/(1024.0*1024.0);
    // printf("sendStridedBuffer: sendDims %d %d, sendOffset %d %d, srcDim %d %d\n", sendDim[0], sendDim[1], sendOffset[0], sendOffset[1], srcDim[0], srcDim[1]);
    MPI_Datatype subArray;
    MPI_Type_create_subarray(2,srcDim, sendDim, sendOffset,
@@ -430,7 +430,7 @@ recvStridedBuffer(float *dstBuf,
    //
 
    msgcnt++;
-   bytes += dstHeight * dstWidth * sizeof(float);
+   bytes += dstHeight * dstWidth * sizeof(float)/(1024.0*1024.0);
    int dstDims[2] = {dstHeight, dstWidth};
    int dstOffset[2] = { dstOffsetRow, dstOffsetColumn};
    int expectedDims[2] = {expectedHeight, expectedWidth};
@@ -813,7 +813,7 @@ int main(int ac, char *av[]) {
       printf("\tSobel time:\t%6.4f (ms) \n", elapsed_sobel_time*1000.0);
       printf("\tGather time:\t%6.4f (ms) \n", elapsed_gather_time*1000.0);
       printf("\tnumber of messages sent:\t%d \n", msgcnt);
-      printf("\ttotal bytes sent:\t%6.4f \n", (double)bytes/(1024.0 * 1024.0));
+      printf("\ttotal bytes sent:\t%6.4f \n", (double)bytes);
 
    }
 
